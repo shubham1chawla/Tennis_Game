@@ -114,7 +114,7 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 	}
 
 	public void createScoreConstraints(){
-		maxScore = 1;
+		maxScore = 5;
 		resetScore();
 	}
 
