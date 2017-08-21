@@ -101,9 +101,6 @@ public class Tennis_Game extends JFrame implements Runnable,  KeyListener, Event
 		while(loop!=null){
 			startTime = System.currentTimeMillis();
 
-			//FOR DEBUGGING
-			// System.out.println(gamePhysics.presentState);
-
 			//HANDLE IMPUTS
 			gamePhysics.eventProcessor.processEventList();
 

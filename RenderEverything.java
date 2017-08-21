@@ -8,7 +8,6 @@
 import java.util.*;
 import java.awt.*;
 import java.awt.image.*;
-import java.awt.event.*;
 import java.awt.geom.*;
 import javax.swing.*;
 
@@ -18,6 +17,7 @@ public class RenderEverything{
 	private Graphics2D ballGraphics, groundGraphics, paddleGraphics, startScreenGraphics, winScreenGraphics, pauseScreenGraphics;
 	private BufferedImage ballImage, tennisGroundImage, paddleImage, startScreenImage, winScreenImage, pauseScreenImage;
 	private Ellipse2D.Double ballShape, paddleShape;
+	private Font title, score, tagFont, normal;
 
 	public RenderEverything(GamePhysics gamePhysics){
 		this.gamePhysics = gamePhysics;
@@ -28,6 +28,7 @@ public class RenderEverything{
 		createStartScreenGraphics();
 		createWinScreenGraphics();
 		createPauseScreenGraphics();
+		createFonts();
 	}
 
 	public void createBallGraphics(){
@@ -115,25 +116,9 @@ public class RenderEverything{
 		winScreenImage = new BufferedImage(gamePhysics.canvas.width, gamePhysics.canvas.height, BufferedImage.TYPE_INT_RGB);
 		winScreenGraphics = (Graphics2D)winScreenImage.getGraphics();
 
-		//CREATING TENNIS GROUND
-
-		//FIRST GRASS
-		winScreenGraphics.setColor(gamePhysics.groundColor);
+		//WHITE OVERLAY
+		winScreenGraphics.setColor(Color.white);
 		winScreenGraphics.fillRect(0, 0, gamePhysics.canvas.width, gamePhysics.canvas.height);
-
-		//NOW LINES
-		winScreenGraphics.setColor(gamePhysics.groundLineColor);
-		winScreenGraphics.fillRect(gamePhysics.groundLineGap, 
-								gamePhysics.groundLineGap, 
-								gamePhysics.canvas.width - 2*gamePhysics.groundLineGap, 
-								gamePhysics.canvas.height - 2*gamePhysics.groundLineGap);
-
-		//GRASS AGAIN
-		winScreenGraphics.setColor(gamePhysics.groundColor);
-		winScreenGraphics.fillRect(gamePhysics.groundLineGap + gamePhysics.groundLineThickness, 
-								gamePhysics.groundLineGap + gamePhysics.groundLineThickness, 
-								gamePhysics.canvas.width - 2*(gamePhysics.groundLineGap + gamePhysics.groundLineThickness), 
-								gamePhysics.canvas.height - 2*(gamePhysics.groundLineGap + gamePhysics.groundLineThickness));
 
 		winScreenGraphics.dispose();
 	}
@@ -149,56 +134,112 @@ public class RenderEverything{
 		pauseScreenGraphics.dispose();
 	}
 
+	public void createFonts(){
+		title = new Font("Impact", Font.PLAIN, 72);
+		tagFont = new Font("Arial", Font.PLAIN, 24);
+	}
+
 	public void renderEverythingOnBB(Graphics2D bbGraphics){
 
 		if(gamePhysics.presentState == gamePhysics.presentState.START_SCREEN){
 			renderStartScreenBackground(bbGraphics);
 
-			//TEMPORARY SCREEN
-			bbGraphics.setColor(Color.black);
-			bbGraphics.drawString("Tennis Game", 
-								  (gamePhysics.canvas.width - 80)/2, 
-								  4*gamePhysics.groundLineGap);
-
-			bbGraphics.setColor(gamePhysics.bColor);
-			bbGraphics.fillRect(gamePhysics.startButton.x,
-								gamePhysics.startButton.y, 
-								gamePhysics.bThickness, 
-								gamePhysics.bWidth);
-
+			//TITLE
 			bbGraphics.setColor(Color.white);
-			bbGraphics.drawString("START", gamePhysics.canvas.width/2 - 18, 
-										   gamePhysics.canvas.height/2 + 5);
+			bbGraphics.setFont(title);
+			bbGraphics.drawString("Tennis Game", 
+								  (gamePhysics.canvas.width - 380)/2, 
+								  5*gamePhysics.groundLineGap);
+
+			//BUTTON
+			if(gamePhysics.mouseOver){
+				bbGraphics.setColor(gamePhysics.hoverColor);
+			}
+			else{
+				bbGraphics.setColor(gamePhysics.paddleColor);
+			}
+	
+			bbGraphics.fillRect(gamePhysics.startButton.x,
+										 gamePhysics.startButton.y, 
+										 gamePhysics.bThickness, 
+										 gamePhysics.bWidth);
+
+			//START TEXT
+			bbGraphics.setColor(Color.white);
+			bbGraphics.setFont(tagFont);
+			bbGraphics.drawString("START", gamePhysics.canvas.width/2 - 36, 
+										   gamePhysics.canvas.height/2 + 8);
 
 		}
 		else if(gamePhysics.presentState == gamePhysics.presentState.GAME_SCREEN){
 			renderGameBackground(bbGraphics);			
+
+			//PRINTING SCORE
+			bbGraphics.setColor(Color.white);
+			bbGraphics.setFont(title);
+			bbGraphics.drawString(""+gamePhysics.playerScore, 
+								  4*gamePhysics.groundLineGap, 
+								  4*gamePhysics.groundLineGap);
+			bbGraphics.drawString(""+gamePhysics.computerScore, 
+								  gamePhysics.canvas.width - 5*gamePhysics.groundLineGap, 
+								  4*gamePhysics.groundLineGap);
+
 			renderBall(bbGraphics);
 			renderPaddle(bbGraphics);
 
-			//PRINTING SCORE
-
-			bbGraphics.setColor(Color.black);
-			bbGraphics.drawString("Player Score: "+gamePhysics.playerScore, 
-								  2*gamePhysics.groundLineGap, 
-								  2*gamePhysics.groundLineGap);
-			bbGraphics.drawString("Computer Score: "+gamePhysics.computerScore, 
-								  gamePhysics.canvas.width - 6*gamePhysics.groundLineGap, 
-								  2*gamePhysics.groundLineGap);
 		}
 		else if(gamePhysics.presentState == gamePhysics.presentState.PAUSE_SCREEN){
 			renderPauseScreenBackground(bbGraphics);
 
 			//PRINTING MESSAGE
-			bbGraphics.setColor(Color.black);
-			bbGraphics.drawString("GAME PAUSED!", (gamePhysics.canvas.width - 40)/2, (gamePhysics.canvas.height)/2);
+			bbGraphics.setColor(gamePhysics.paddleColor);
+			bbGraphics.setFont(title);
+			bbGraphics.drawString("GAME PAUSED!", (gamePhysics.canvas.width - 420)/2, (gamePhysics.canvas.height)/2);
+
+		}else if(gamePhysics.presentState == gamePhysics.presentState.WIN_SCREEN){
+			renderWinScreenBackground(bbGraphics);
+
+			bbGraphics.setColor(gamePhysics.paddleColor);
+			bbGraphics.setFont(title);
+			if(gamePhysics.playerWin)
+				bbGraphics.drawString("Player Won", 
+									  (gamePhysics.canvas.width - 340)/2, 
+									  6*gamePhysics.groundLineGap);
+			else
+				bbGraphics.drawString("Computer Won", 
+									  (gamePhysics.canvas.width - 440)/2, 
+									  6*gamePhysics.groundLineGap);
+
+			//BUTTON
+			if(gamePhysics.mouseOver){
+				bbGraphics.setColor(gamePhysics.hoverColor);
+			}else{
+				bbGraphics.setColor(gamePhysics.paddleColor);
+			}
+
+			bbGraphics.fillRect(gamePhysics.startButton.x,
+									   gamePhysics.startButton.y, 
+									   gamePhysics.bThickness, 
+									   gamePhysics.bWidth);
+
+			//START TEXT
+			bbGraphics.setColor(Color.white);
+			bbGraphics.setFont(tagFont);
+			bbGraphics.drawString("Again?", gamePhysics.canvas.width/2 - 36, 
+										   gamePhysics.canvas.height/2 + 8);
 		}
 
 		//TAG
 		String tag = "(C) Shubham Chawla - 2017";
-		bbGraphics.setColor(Color.black);
+		if(gamePhysics.presentState == gamePhysics.presentState.PAUSE_SCREEN ||
+		   gamePhysics.presentState == gamePhysics.presentState.WIN_SCREEN)
+			bbGraphics.setColor(gamePhysics.paddleColor);
+		else
+			bbGraphics.setColor(Color.black);
+
+		bbGraphics.setFont(tagFont);
 		bbGraphics.drawString(tag, 
-							 (gamePhysics.canvas.width - 160)/2, 
+							 (gamePhysics.canvas.width - 320)/2, 
 							 gamePhysics.canvas.height - 10);
 	}
 
@@ -236,5 +277,10 @@ public class RenderEverything{
 	public void renderPauseScreenBackground(Graphics2D bbGraphics){
 		//RENDER GRAPHICS TO BACK-BUFFER.
 		bbGraphics.drawImage(pauseScreenImage, 0, 0, null);
+	}
+
+	public void renderWinScreenBackground(Graphics2D bbGraphics){
+		//RENDER GRAPHICS TO BACK-BUFFER.
+		bbGraphics.drawImage(winScreenImage, 0, 0, null);
 	}
 }

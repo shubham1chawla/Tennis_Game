@@ -20,7 +20,7 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 	public Color ballColor, groundColor, groundLineColor;
 	private int minBallSpeed;
 	public int playerScore, computerScore, maxScore;
-	private boolean playerWin;
+	public boolean playerWin;
 
 	//PADDLE VARIABLES
 	public int paddle1X, paddle2X;
@@ -33,6 +33,8 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 	public Point startButton = new Point();
 	public int bThickness, bWidth;
 	public Color bColor;
+	public Color hoverColor;
+	public boolean mouseOver;
 
 	//PAUSE TOGGLE
 	private boolean paused;
@@ -53,7 +55,6 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 
 		this.eventProcessor = eventProcessor;
 
-		//addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 
@@ -71,10 +72,12 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 								(canvas.height-bWidth)/2);
 		bColor = Color.blue;
 		pauseScreenColor = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+		hoverColor = new Color(44, 62, 80);
 
 		presentState = gameStates.START_SCREEN;
 		paused = false;
 		escapeKeyPressed = false;
+		mouseOver = false;
 	}
 
 	public void createBallConstraints(){
@@ -111,14 +114,13 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 	}
 
 	public void createScoreConstraints(){
-		maxScore = 5;
+		maxScore = 1;
 		resetScore();
 	}
 
 	public void resetScore(){
 		playerScore = 0;
 		computerScore = 0;
-		playerWin = false;
 	}
 
 	//THIS FUNCTION RUNS BOTH BALL MOTION AND PADDLE MOTION
@@ -127,6 +129,8 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 			presentState = presentState.WIN_SCREEN;
 			if(playerScore == maxScore)
 				playerWin = true;
+			else
+				playerWin = false;
 		}
 
 		ballMotionPhysics();
@@ -256,18 +260,32 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 			switch(e.getID()){
 				case MouseEvent.MOUSE_CLICKED:
 					MouseEvent m_event = (MouseEvent)e;
-					if(presentState == presentState.START_SCREEN){
+					if(presentState == presentState.START_SCREEN || presentState == presentState.WIN_SCREEN){
 						if(m_event.getX() >= startButton.x && 
 						   m_event.getX() <= startButton.x + bThickness && 
 						   m_event.getY() >= startButton.y && 
-						   m_event.getY() <= startButton.y + bWidth)
+						   m_event.getY() <= startButton.y + bWidth){
+							
+							resetScore();
 							presentState = presentState.GAME_SCREEN;
+						}
 					}
 					break;
 
 				case MouseEvent.MOUSE_MOVED:
 					MouseEvent m_event1 = (MouseEvent)e;
 					paddle1Y = m_event1.getY() - paddleThickness/2;
+
+					if(m_event1.getX() >= startButton.x && 
+					   m_event1.getX() <= startButton.x + bThickness && 
+					   m_event1.getY() >= startButton.y && 
+					   m_event1.getY() <= startButton.y + bWidth){
+						mouseOver = true;
+					}
+					else{
+						mouseOver = false;
+					}
+
 					break;
 
 				case MouseEvent.MOUSE_EXITED:
