@@ -267,6 +267,7 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 						   m_event.getY() <= startButton.y + bWidth){
 							
 							resetScore();
+							resetBallPosition();
 							if(presentState != presentState.PAUSE_SCREEN)
 								presentState = presentState.GAME_SCREEN;
 							else
