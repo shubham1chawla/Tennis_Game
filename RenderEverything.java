@@ -194,7 +194,32 @@ public class RenderEverything{
 			//PRINTING MESSAGE
 			bbGraphics.setColor(gamePhysics.paddleColor);
 			bbGraphics.setFont(title);
-			bbGraphics.drawString("GAME PAUSED!", (gamePhysics.canvas.width - 420)/2, (gamePhysics.canvas.height)/2);
+			bbGraphics.drawString("GAME PAUSED!", (gamePhysics.canvas.width - 420)/2, 6*gamePhysics.groundLineGap);
+
+			//BUTTON
+			if(gamePhysics.mouseOver){
+				bbGraphics.setColor(gamePhysics.hoverColor);
+			}
+			else{
+				bbGraphics.setColor(gamePhysics.paddleColor);
+			}
+	
+			bbGraphics.fillRect(gamePhysics.startButton.x,
+										 gamePhysics.startButton.y, 
+										 gamePhysics.bThickness, 
+										 gamePhysics.bWidth);
+
+			//MENU TEXT
+			bbGraphics.setColor(Color.white);
+			bbGraphics.setFont(tagFont);
+			bbGraphics.drawString("MENU", gamePhysics.canvas.width/2 - 36, 
+										   gamePhysics.canvas.height/2 + 8);
+
+			//MENU TEXT
+			bbGraphics.setColor(gamePhysics.paddleColor);
+			bbGraphics.setFont(tagFont);
+			bbGraphics.drawString("Hint: Press ESC to pause.", gamePhysics.canvas.width/2 - 140, 
+										   10*gamePhysics.groundLineGap);
 
 		}else if(gamePhysics.presentState == gamePhysics.presentState.WIN_SCREEN){
 			renderWinScreenBackground(bbGraphics);
