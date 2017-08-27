@@ -260,14 +260,17 @@ public class GamePhysics extends JComponent implements MouseListener, MouseMotio
 			switch(e.getID()){
 				case MouseEvent.MOUSE_CLICKED:
 					MouseEvent m_event = (MouseEvent)e;
-					if(presentState == presentState.START_SCREEN || presentState == presentState.WIN_SCREEN){
+					if(presentState == presentState.START_SCREEN || presentState == presentState.WIN_SCREEN || presentState == presentState.PAUSE_SCREEN){
 						if(m_event.getX() >= startButton.x && 
 						   m_event.getX() <= startButton.x + bThickness && 
 						   m_event.getY() >= startButton.y && 
 						   m_event.getY() <= startButton.y + bWidth){
 							
 							resetScore();
-							presentState = presentState.GAME_SCREEN;
+							if(presentState != presentState.PAUSE_SCREEN)
+								presentState = presentState.GAME_SCREEN;
+							else
+								presentState = presentState.START_SCREEN;
 						}
 					}
 					break;
